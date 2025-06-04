@@ -34,7 +34,7 @@ echo ******INSTALLING JITSI-ADMIN*******
 echo ""
 
 pushd /var/www
-[ ! -d "/var/www/jitsi-admin" ] && git clone https://github.com/H2-invent/jitsi-admin.git
+[ ! -d "/var/www/meetup" ] && git clone https://github.com/H2-invent/jitsi-admin.git
 
 popd
 
