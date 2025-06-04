@@ -34,22 +34,22 @@ echo ******INSTALLING JITSI-ADMIN*******
 echo ""
 
 pushd /var/www
-[ ! -d "/var/www/meetup" ] && git clone https://github.com/H2-invent/jitsi-admin.git
+[ ! -d "/var/www/meetup" ] && git clone https://github.com/sazaco/jitsi-admin.git
 
 popd
 
-pushd /var/www/jitsi-admin
-git -C /var/www/jitsi-admin checkout $BRANCH
-git -C /var/www/jitsi-admin reset --hard
-git -C /var/www/jitsi-admin pull
+pushd /var/www/meetup
+git -C /var/www/meetup checkout $BRANCH
+git -C /var/www/meetup reset --hard
+git -C /var/www/meetup pull
 
 export COMPOSER_ALLOW_SUPERUSER=1
 php composer.phar install --no-interaction
 php composer.phar dump-autoload
 cp -n .env.sample .env.local
 
-sudo mysql -e "CREATE USER 'jitsiadmin'@'localhost' IDENTIFIED  BY 'jitsiadmin';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON jitsi_admin.* TO 'jitsiadmin'@'localhost';"
+sudo mysql -e "CREATE USER 'meetup'@'localhost' IDENTIFIED  BY 'meetup';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON meetup.* TO 'meetup'@'localhost';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
 php bin/console app:install
@@ -78,19 +78,19 @@ echo ""
 echo *******Build Webesocket********
 echo ""
 popd
-pushd /var/www/jitsi-admin/nodejs
+pushd /var/www/meetup/nodejs
 npm install
 popd
 
 clear
 
-pushd /var/www/jitsi-admin
+pushd /var/www/meetup
 echo ""
 echo *******CONFIGURING SERVICES********
 echo ""
 
 crontab -l > cron_bkp
-echo "* * * * * php /var/www/jitsi-admin/bin/console cron:run 1>> /dev/null 2>&1" > cron_bkp
+echo "* * * * * php /var/www/meetup/bin/console cron:run 1>> /dev/null 2>&1" > cron_bkp
 crontab cron_bkp
 rm cron_bkp
 
@@ -100,13 +100,13 @@ chown -R www-data:www-data theme/
 
 
 
-cp installer/nginx.conf /etc/nginx/sites-enabled/jitsi-admin.conf
+cp installer/nginx.conf /etc/nginx/sites-enabled/meetup.conf
 rm /etc/nginx/sites-enabled/default
-cp installer/jitsi-admin_messenger.service /etc/systemd/system/jitsi-admin_messenger.service
-cp installer/jitsi-admin.conf /etc/systemd/system/jitsi-admin.conf
+cp installer/meetup_messenger.service /etc/systemd/system/meetup_messenger.service
+cp installer/meetup.conf /etc/systemd/system/meetup.conf
 
 cp -r nodejs /usr/local/bin/websocket
-cp installer/jitsi-admin_websocket.service /etc/systemd/system/jitsi-admin_websocket.service
+cp installer/meetup_websocket.service /etc/systemd/system/meetup_websocket.service
 mkdir /var/log/websocket/
 
 
@@ -114,19 +114,19 @@ service php*-fpm restart
 service nginx restart
 
 systemctl daemon-reload
-service  jitsi-admin* stop
+service  meetup* stop
 
-service  jitsi-admin_messenger start
-service  jitsi-admin_messenger restart
+service  meetup_messenger start
+service  meetup_messenger restart
 
-systemctl enable jitsi-admin_messenger
+systemctl enable meetup_messenger
 
 systemctl daemon-reload
 
-service  jitsi-admin_websocket start
-service  jitsi-admin_websocket restart
+service  meetup_websocket start
+service  meetup_websocket restart
 
-systemctl enable jitsi-admin_websocket
+systemctl enable meetup_websocket
 
 
 popd
